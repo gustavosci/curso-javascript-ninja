@@ -96,7 +96,6 @@
 	var myName = "Gustavo NhufhfoNUHF";
 	myName = myName.toUpperCase();
 	myName = myName.split("");
-	console.log(myName);
 	for(var i = 1; i < myName.length; i++){
 		if (i % 2 !== 0){
 			myName[i] = myName[i].toLowerCase();
