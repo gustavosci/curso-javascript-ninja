@@ -14,4 +14,57 @@ Utilize o atributo data-js para nomear o campo e os botões. Você pode
 usar o nome que achar melhor, desde que ele seja semântico, ou seja, o nome
 dado ao elemento HTML deve definir o que o elemento é ou o que ele faz.
 */
-// ?
+(function(doc){
+
+	"use strict";
+
+	// Busca elementos HTML
+	var $iptCronometro = doc.querySelector( '[data-js="iptCronometro"]' );
+	var $btnStart = doc.querySelector( '[data-js="btnStart"]' );
+	var $btnStop = doc.querySelector( '[data-js="btnStop"]' );
+	var $btnReset = doc.querySelector( '[data-js="btnReset"]' );
+
+	// Variáveis de controle do cronômetro
+	var temporizador;
+	var counter = 0;
+	var started = false;
+
+	// Defaults tela
+	$iptCronometro.value = 0;
+
+
+	// Eventos de clique nos botões
+	$btnStart.addEventListener("click", function(eve){
+		eve.preventDefault();
+		if(started){
+			return alert("O cronômetro já está iniciado!");
+		}
+		started = true;
+		function timer(){
+			counter = counter + 1;
+			$iptCronometro.value = counter;
+			temporizador = setTimeout(timer, 1000);
+		}
+		timer();
+
+	}, false);
+
+	$btnStop.addEventListener("click", function(eve){
+		eve.preventDefault();
+		stopCronometro();
+	}, false);
+
+	$btnReset.addEventListener("click", function(eve){
+		eve.preventDefault();
+		stopCronometro();
+		counter = 0;
+		$iptCronometro.value = counter;
+	}, false);
+
+	// Subrotinas
+	function stopCronometro(){
+		clearTimeout(temporizador);
+		started = false;		
+	}
+
+}(document));
