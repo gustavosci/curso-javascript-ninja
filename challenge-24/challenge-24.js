@@ -35,9 +35,6 @@ input;
 	var $btnCE = doc.querySelector( '[data-js="btnCE"]');
 	var $btnEqual =  doc.querySelector( '[data-js="btnEqual"]');
 
-	// Desabilita e inicializa campo de cálculo
-	$iptCalculo.disabled = true;
-
 
 	// Clique nos botões de números
 	Array.prototype.forEach.call($btnNumbers, function(btn){
@@ -52,7 +49,7 @@ input;
 	// Clique no botão CE
 	$btnCE.addEventListener("click", function(eve){
 		eve.preventDefault();
-		$iptCalculo.value = "";
+		$iptCalculo.value = 0;
 	}, false);
 
 	// Clique no botão =
@@ -62,36 +59,34 @@ input;
 	// Ações de clique em botões
 	function actionClickNumber(btn){
 		btn.preventDefault();
-		$iptCalculo.value += btn.value;		
+		$iptCalculo.value += this.value;		
 	}
 
 	function actionClickOperation(btn){
-		btn.preventDefault();		
-		addOperation(btn.value);
+		btn.preventDefault();
+		removeLastItemIfOperation();		
+		$iptCalculo.value += this.value;	
 	}
 
 	function actionClickEqual(btn){
 		btn.preventDefault();
 		removeLastItemIfOperation();
-
-		//Continuar aqui
 		var result = 0;
-		var ope = "";
+		var ope = null;
 		var numOpe = null;
-		var regexCalc = /(\d+)|[\/*\+-]/g;
-		var calculo = $iptCalculo.value.match(regexCalc);
-		calculo.forEach(function (valorAtual, index){
-			if(! isOperation(valorAtual)){
+		var calculo = $iptCalculo.value.match(/(\d+)|[\/*\+-]/g);
+		calculo.forEach(function (capAtual, index){
+			if(! isOperation(capAtual)){
 				if(index === 0){
-					result = +valorAtual;
+					result = +capAtual;
 				} else {
-					 numOpe = +valorAtual;
+					 numOpe = +capAtual;
 				}
 			} else {
-				ope = valorAtual;
+				ope = capAtual;
 			}
 			
-			if(ope !== "" && numOpe !== null){
+			if(ope !== null && numOpe !== null){
 				switch(ope){
 					case "/":
 						result = result / numOpe;
@@ -106,25 +101,15 @@ input;
 						result = result - numOpe;
 						break;
 				}						
-				ope = "";
+				ope = null;
 				numOpe = null;
 			}
 		})
 		$iptCalculo.value = result;
-
 	}
 
 
 	// Subrotinas
-	function addOperation(ope){
-		removeLastItemIfOperation();
-
-		// Centralizar split e join
-		var strCalculo = $iptCalculo.value.split("");
-		strCalculo.push(ope);
-		$iptCalculo.value = strCalculo.join("");
-	}
-
 	function removeLastItemIfOperation(){
 		if(isLastItemOperation($iptCalculo.value)){
 			var strCalculo = $iptCalculo.value.split("");
@@ -143,6 +128,5 @@ input;
 			return operator === ope;
 		})
 	}
-
 
 })(document);
