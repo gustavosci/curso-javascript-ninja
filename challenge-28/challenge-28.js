@@ -25,3 +25,92 @@
   - Utilize a lib DOM criada anteriormente para facilitar a manipulação e
   adicionar as informações em tela.
   */
+(function(doc){
+  "use strict";
+
+  var $iptCEP = new DOM('[data-js="iptCep"]');
+  var $btnSubmit = new DOM('[data-js="submit"]');
+  var $divResult = new DOM('[data-js="divResult"]');
+  var $status = new DOM('[data-js="status"]');
+  var $textStatus = $status.get()[0];
+  var ajax = new XMLHttpRequest();
+
+  $btnSubmit.on("click", handleClickSubmit);
+  
+  function handleClickSubmit(eve){
+    eve.preventDefault();
+    var cep = clearCEP($iptCEP.get()[0].value);
+    doAjaxCEP(cep);
+  }
+
+  function clearCEP(cep){
+    return cep.replace(/\D/g, "");
+  }
+
+  function doAjaxCEP(cep){
+    var url = "https://viacep.com.br/ws/" + cep + "/json/";
+    modifyTextTag($textStatus, "Buscando informações para o CEP " + cep + "...");
+    try{
+      ajax.open("GET", url);
+      ajax.send();  
+      ajax.addEventListener("readystatechange", handleResponseAjax, false);
+    }
+    catch(e){
+      updateDataResultError();
+    }
+  }
+
+  function handleResponseAjax(){
+    if( ajax.readyState !== 4 ){
+      return;
+    }
+
+    if( ajax.status === 200 ){
+      try{
+        var dataResponse = JSON.parse(ajax.responseText);        
+        if(dataResponse.erro === true){
+          updateDataResultError();
+        } else {
+          updateDataResultOk(dataResponse);
+        }
+      }
+      catch(e){
+        updateDataResultError();
+      }      
+    } else {
+      updateDataResultError();
+    }
+  }
+
+
+  function updateDataResultOk(dataResponse){
+    updateData(dataResponse);
+  }
+
+  function updateDataResultError(){
+    updateData();
+  }
+
+  function updateData(dataResponse){
+    var typeUpdateOk = dataResponse !== undefined;
+    var elementsResult = $divResult.get()[0].children;
+    Array.prototype.forEach.call(elementsResult, function(nodeP){
+      var fieldSpam = nodeP.firstElementChild.getAttribute("data-js");
+      if( fieldSpam !== undefined){
+        if(typeUpdateOk)
+          modifyTextTag(nodeP.firstElementChild, dataResponse[fieldSpam]);
+        else
+          modifyTextTag(nodeP.firstElementChild, "-");
+      }
+    })
+    if(typeUpdateOk)
+      modifyTextTag($textStatus, "Consulta realizada com sucesso");
+    else
+      modifyTextTag($textStatus, "Erro na consulta do CEP. Tenta mais tarde.");   
+  }
+
+  function modifyTextTag(node, newText){
+    node.firstChild.nodeValue = newText;
+  }
+
+}(document));
