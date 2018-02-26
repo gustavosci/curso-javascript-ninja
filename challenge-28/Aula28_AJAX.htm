@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aula 28 - AJAX</title>
+  <script src="LibDOM.js"></script>
+</head>
+<body data-js="body">
+	<div>
+		<form action="">
+			<label>CEP</label>
+			<input type="text" data-js="iptCep" />				
+			<button type="submit" data-js="submit">Enviar </button>
+		</form>
+	</div>
+	<div data-js="divStatus">
+		<p>Status: <span data-js="status">Aguardando requisição</span></p>
+	</div>
+	<div data-js="divResult">
+		<p>CEP: <span data-js="cep">-</span></p>
+		<p>Logradouro: <span data-js="logradouro">-</span></p>
+		<p>Bairro: <span data-js="bairro">-</span></p>
+		<p>Localidade: <span data-js="localidade">-</span></p>
+		<p>UF: <span data-js="uf">-</span></p>
+	</div>
+	<script src="Aula28.js"></script>
+</body>
+</html>
