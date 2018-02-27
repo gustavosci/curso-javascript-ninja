@@ -1,4 +1,4 @@
-(function() {
+(function(doc) {
   'use strict';
 
   /*
@@ -29,11 +29,94 @@
   Essas informações devem ser adicionadas no HTML via Ajax.
 
   Parte técnica:
-  Separe o nosso módulo de DOM criado nas últimas aulas em
-  um arquivo DOM.js.
+  Separe o nosso módulo de DOM criado nas últimas aulas em um arquivo DOM.js.
 
   E aqui nesse arquivo, faça a lógica para cadastrar os carros, em um módulo
   que será nomeado de "app".
   */
 
-})();
+  function app(){
+    var $spamCompanyData = new DOM('[data-js="spamCompanyData"');
+    var $formCadastro = new DOM('[data-js="formCadastro"');
+    var $tableResult = new DOM('[data-js="tableResult"');
+    var $inputs = new DOM('input');
+    var ajax = new XMLHttpRequest();
+
+    $formCadastro.get()[0].addEventListener("submit", handleFormSubmit, false);
+    setInfoCompany();
+
+    function handleFormSubmit(eve){
+      eve.preventDefault();
+
+      var docFragment = doc.createDocumentFragment();
+      var newTR = doc.createElement("tr");      
+      $inputs.forEach(function(element){
+        var newTH = appendColunOnTable(element.value);
+        newTR.appendChild(newTH);  
+      });
+      docFragment.appendChild(newTR);
+      $tableResult.get()[0].firstElementChild.appendChild(docFragment);
+
+      clearForm();
+    }
+
+    function appendColunOnTable(newText){      
+      var newTH = doc.createElement("th");
+      if( !newText )
+        newText = "-";
+      var newContentTH = doc.createTextNode(newText);
+      newTH.appendChild(newContentTH);
+      return newTH;
+    }
+
+    function clearForm(){
+      $inputs.forEach(function(element){
+        element.value = "";
+      });
+    }
+
+    function setInfoCompany(){
+      var path = "json/company.json";
+      try{
+        getCompanyJson();
+      }
+      catch(e){
+        updateDataCompanyError();
+      }
+    } 
+
+    function getCompanyJson(){
+      ajax.open("GET", path);
+      ajax.send();  
+      ajax.addEventListener("readystatechange", handleResponseAjax, false);
+
+    }
+
+    function handleResponseAjax(){
+      if( isRequestOk() ){
+        try{
+          var dataResponse = JSON.parse(ajax.responseText);        
+          updateDataCompanyOk(dataResponse);
+        }
+        catch(e){
+          updateDataCompanyError();
+        }      
+      }
+    }
+
+    function isRequestOk(){
+      return ajax.readyState === 4 && ajax.status === 200;
+    }
+
+    function updateDataCompanyOk(dataCompany){
+      $spamCompanyData.get()[0].textContent = dataCompany.name + " - " + dataCompany.phone;
+    }
+
+    function updateDataCompanyError(){
+      $spamCompanyData.get()[0].textContent = "Dados da empresa não encontrados";
+    }
+  }
+
+  app();
+
+})(document);
